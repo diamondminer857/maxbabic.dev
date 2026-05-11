@@ -1,17 +1,69 @@
 ---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
 
+const recentPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const featuredProjects = (await getCollection('projects'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout current="home">
+  <section class="hero">
+    <div>
+      <div class="hero-meta">Maxmilián Babič · Ostrava, CZ</div>
+      <h1>Notes from a<br /><span class="italic">student engineer.</span></h1>
+      <p class="hero-text">
+        A small corner of the internet for write-ups, half-finished experiments,
+        and the occasional rant about RF interference. Currently studying networking
+        and embedded systems at VŠB-TUO.
+      </p>
+    </div>
+    <div class="hero-aside">
+      <div class="label">est.</div>
+      <div class="value">2025</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2 class="section-title">Recent <em>writing</em></h2>
+      <span class="section-num">/ 01</span>
+    </div>
+    <div class="posts">
+      {recentPosts.map((post) => (
+        <a href={`/blog/${post.id}`} class="post-card">
+          <span class="post-date">{formatDate(post.data.date)}</span>
+          <span class="post-title">{post.data.title}</span>
+          {post.data.tag && <span class="post-tag">{post.data.tag}</span>}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2 class="section-title">Selected <em>projects</em></h2>
+      <span class="section-num">/ 02</span>
+    </div>
+    <div class="projects">
+      {featuredProjects.map((project) => (
+        <a href={`/projects/${project.id}`} class="project">
+          <div class="project-meta">
+            <span>{project.data.year} · {project.data.category}</span>
+            <span>{project.data.tech}</span>
+          </div>
+          <div class="project-title">{project.data.title}</div>
+          <div class="project-desc">{project.data.description}</div>
+          <span class="project-arrow">→</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

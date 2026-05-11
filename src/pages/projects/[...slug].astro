@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Layout
+  current="projects"
+  title={`${project.data.title} — maxbabic.dev`}
+  description={project.data.description}
+>
+  <article class="article">
+    <header class="article-header">
+      <div class="article-meta">
+        <span>{project.data.year}</span>
+        <span>· {project.data.category}</span>
+        <span>· {project.data.tech}</span>
+      </div>
+      <h1 class="article-title">{project.data.title}</h1>
+      {(project.data.github || project.data.link) && (
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          {project.data.github && (
+            <a
+              href={project.data.github}
+              target="_blank"
+              rel="noopener"
+              style="font-family: var(--mono); font-size: 0.85rem; color: var(--accent); text-decoration: underline;"
+            >
+              github →
+            </a>
+          )}
+          {project.data.link && (
+            <a
+              href={project.data.link}
+              target="_blank"
+              rel="noopener"
+              style="font-family: var(--mono); font-size: 0.85rem; color: var(--accent); text-decoration: underline;"
+            >
+              live →
+            </a>
+          )}
+        </div>
+      )}
+    </header>
+
+    <div class="article-content">
+      <Content />
+    </div>
+  </article>
+</Layout>

@@ -1,5 +1,14 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// https://astro.build/config
-export default defineConfig({});
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  site: 'https://maxbabic.dev',
+
+  build: {
+    format: 'directory',
+  },
+
+  adapter: cloudflare(),
+});

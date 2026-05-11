@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Layout current="projects" title="Projects — maxbabic.dev">
+  <section>
+    <div class="section-head">
+      <h2 class="section-title">All <em>projects</em></h2>
+      <span class="section-num">/ 02</span>
+    </div>
+
+    <div class="projects">
+      {projects.map((project) => (
+        <a href={`/projects/${project.id}`} class="project">
+          <div class="project-meta">
+            <span>{project.data.year} · {project.data.category}</span>
+            <span>{project.data.tech}</span>
+          </div>
+          <div class="project-title">{project.data.title}</div>
+          <div class="project-desc">{project.data.description}</div>
+          <span class="project-arrow">→</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

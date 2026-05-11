@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+---
+
+<Layout
+  current="blog"
+  title={`${post.data.title} — maxbabic.dev`}
+  description={post.data.description}
+>
+  <article class="article">
+    <header class="article-header">
+      <div class="article-meta">
+        <span>{formatDate(post.data.date)}</span>
+        {post.data.tag && <span>· {post.data.tag}</span>}
+      </div>
+      <h1 class="article-title">{post.data.title}</h1>
+    </header>
+
+    <div class="article-content">
+      <Content />
+    </div>
+  </article>
+</Layout>
